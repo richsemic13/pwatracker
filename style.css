@@ -1,0 +1,250 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+    min-height: 100vh;
+    background-attachment: fixed;
+}
+
+/* =========================
+   AUTH SECTION
+========================= */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 18px;
+    padding: 25px 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.auth-container h2 {
+    font-weight: 700;
+    color: #3b4a6b;
+}
+
+/* =========================
+   MAIN APP
+========================= */
+.main {
+    width: 100%;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.top-bar {
+    width: 100%;
+    max-width: 1200px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title-area {
+    text-align: center;
+}
+
+.title-area h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #4b4b4b;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 0;
+}
+
+.user-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.welcome-text {
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.logout-btn {
+    min-width: 90px;
+}
+
+/* =========================
+   CONTAINERS
+========================= */
+.budget-container {
+    width: 100%;
+    max-width: 1200px;
+    background: rgba(255, 255, 255, 0.65);
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    margin: 0;
+}
+
+.add-budget-container,
+.add-expense-container,
+.display-container {
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.add-budget-container h4,
+.add-expense-container h4,
+.display-container h5 {
+    font-weight: 600;
+    color: #3b4a6b;
+}
+
+/* =========================
+   SUMMARY CARDS
+========================= */
+.summary-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+
+.summary-card p {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.summary-card h5 {
+    margin-bottom: 0;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* =========================
+   TABLE
+========================= */
+.table-container h5 {
+    font-weight: 600;
+}
+
+.table {
+    background: rgba(255, 255, 255, 0.95);
+    font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle !important;
+}
+
+.table thead th {
+    background: #f2f6ff;
+    color: #3b4a6b;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.action-cell .save-btn,
+.action-cell .cancel-btn {
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.action-cell button {
+    margin: 2px;
+}
+
+/* =========================
+   CHART
+========================= */
+#chartContainer {
+    max-width: 400px;
+    margin: auto;
+    padding: 10px;
+}
+
+/* =========================
+   REMOVE NUMBER ARROWS
+========================= */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+/* =========================
+   MOBILE
+========================= */
+@media (max-width: 768px) {
+    .main {
+        padding: 10px;
+    }
+
+    .title-area h1 {
+        font-size: 1.45rem;
+    }
+
+    .subtitle {
+        font-size: 0.82rem;
+    }
+
+    .budget-container {
+        padding: 10px;
+        border-radius: 16px;
+    }
+
+    .add-budget-container,
+    .add-expense-container,
+    .display-container {
+        padding: 12px;
+    }
+
+    .table {
+        font-size: 0.75rem;
+    }
+
+    .table th,
+    .table td {
+        padding: 6px;
+    }
+
+    .btn {
+        font-size: 0.85rem;
+    }
+
+    .welcome-text {
+        font-size: 0.85rem;
+        text-align: center;
+    }
+}

@@ -1,10 +1,16 @@
-let currentUser = localStorage.getItem("currentUser") || null;
-let budgetData = null;
-let expenseChart = null;
+let budgetData = {
+    totalBudget: 0,
+    totalExpenses: 0,
+    budgetLeft: 0,
+    expenses: []
+};
 
-// =========================
-// AUTH HELPERS
-// =========================
+let expenseChart;
+let currentUser = localStorage.getItem("currentUser") || null;
+
+// ==========================
+// AUTH FUNCTIONS
+// ==========================
 function getUsers() {
     return JSON.parse(localStorage.getItem("users")) || [];
 }
@@ -13,14 +19,13 @@ function saveUsers(users) {
     localStorage.setItem("users", JSON.stringify(users));
 }
 
-function getBudgetKey(username) {
-    return `budgetData_${username}`;
+function getBudgetKey() {
+    return `budgetData_${currentUser}`;
 }
 
 function loadBudgetData() {
-    if (!currentUser) return;
-
-    budgetData = JSON.parse(localStorage.getItem(getBudgetKey(currentUser))) || {
+    const savedData = JSON.parse(localStorage.getItem(getBudgetKey()));
+    budgetData = savedData || {
         totalBudget: 0,
         totalExpenses: 0,
         budgetLeft: 0,
@@ -29,57 +34,44 @@ function loadBudgetData() {
 }
 
 function updateLocalStorage() {
-    if (!currentUser || !budgetData) return;
-    localStorage.setItem(getBudgetKey(currentUser), JSON.stringify(budgetData));
+    if (currentUser) {
+        localStorage.setItem(getBudgetKey(), JSON.stringify(budgetData));
+    }
 }
 
 function showApp() {
-    document.getElementById("authSection").classList.add("d-none");
-    document.getElementById("appSection").classList.remove("d-none");
-    document.getElementById("displayUsername").textContent = currentUser;
+    document.getElementById("authSection").style.display = "none";
+    document.getElementById("appSection").style.display = "block";
 }
 
 function showAuth() {
-    document.getElementById("authSection").classList.remove("d-none");
-    document.getElementById("appSection").classList.add("d-none");
+    document.getElementById("authSection").style.display = "flex";
+    document.getElementById("appSection").style.display = "none";
 }
 
-// =========================
-// FORMAT
-// =========================
+function logoutUser() {
+    localStorage.removeItem("currentUser");
+    currentUser = null;
+    showAuth();
+}
+
+// ==========================
+// BUDGET FUNCTIONS
+// ==========================
 function formatCurrency(value) {
     return "₱" + Number(value).toFixed(2);
 }
 
-// =========================
-// CHART COLORS
-// =========================
-function getChartColors() {
-    return [
-        "#4e73df",
-        "#1cc88a",
-        "#36b9cc",
-        "#f6c23e",
-        "#e74a3b",
-        "#6f42c1"
-    ];
-}
-
-// =========================
-// UI UPDATE
-// =========================
 function updateUI() {
-    if (!budgetData) return;
-
     document.getElementById("totalBudget").textContent = formatCurrency(budgetData.totalBudget);
     document.getElementById("totalExpenses").textContent = formatCurrency(budgetData.totalExpenses);
     document.getElementById("budgetLeft").textContent = formatCurrency(budgetData.budgetLeft);
 
-    const tableBody = document.querySelector(".table-container tbody");
+    let tableBody = document.getElementById("expenseTableBody");
     tableBody.innerHTML = "";
 
     if (budgetData.expenses.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5">No expenses yet.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center">No expenses yet.</td></tr>`;
     } else {
         budgetData.expenses.forEach(expense => {
             let row = document.createElement("tr");
@@ -90,9 +82,9 @@ function updateUI() {
                 <td class="amount-cell">${formatCurrency(expense.amount)}</td>
                 <td class="category-cell">${expense.category}</td>
                 <td>${expense.date}</td>
-                <td class="action-cell">
-                    <button class="btn btn-sm btn-warning edit-btn">Edit</button>
-                    <button class="btn btn-sm btn-danger delete-btn">Remove</button>
+                <td class="action-cell text-center">
+                    <button class="btn btn-sm btn-warning edit-btn mb-1">Edit</button>
+                    <button class="btn btn-sm btn-danger delete-btn mb-1">Remove</button>
                 </td>
             `;
 
@@ -100,24 +92,21 @@ function updateUI() {
         });
     }
 
-    updateChartIfVisible();
+    updateChart();
 }
 
-// =========================
-// CHART UPDATE
-// =========================
-function updateChartIfVisible() {
+function updateChart() {
     const chartContainer = document.getElementById("chartContainer");
-    if (!chartContainer || chartContainer.style.display === "none") return;
+    if (chartContainer.style.display === "none") return;
 
-    const categoryTotals = {};
+    let categories = {};
 
     budgetData.expenses.forEach(expense => {
-        categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+        categories[expense.category] = (categories[expense.category] || 0) + expense.amount;
     });
 
-    const labels = Object.keys(categoryTotals);
-    const data = Object.values(categoryTotals);
+    let labels = Object.keys(categories);
+    let data = Object.values(categories);
 
     const ctx = document.getElementById("expenseChart").getContext("2d");
 
@@ -125,13 +114,21 @@ function updateChartIfVisible() {
         expenseChart.destroy();
     }
 
+    if (labels.length === 0) return;
+
     expenseChart = new Chart(ctx, {
         type: "pie",
         data: {
-            labels: labels.length ? labels : ["No Data"],
+            labels: labels,
             datasets: [{
-                data: data.length ? data : [1],
-                backgroundColor: labels.length ? getChartColors().slice(0, labels.length) : ["#d1d3e2"]
+                data: data,
+                backgroundColor: [
+                    "#4e79a7",
+                    "#f28e2b",
+                    "#e15759",
+                    "#76b7b2",
+                    "#59a14f"
+                ]
             }]
         },
         options: {
@@ -146,12 +143,7 @@ function updateChartIfVisible() {
     });
 }
 
-// =========================
-// RESET
-// =========================
 function resetAll() {
-    if (!currentUser) return;
-
     if (!confirm("Are you sure you want to reset everything?")) return;
 
     budgetData = {
@@ -165,48 +157,64 @@ function resetAll() {
     updateUI();
 }
 
-// =========================
-// LOGOUT
-// =========================
-function logout() {
-    localStorage.removeItem("currentUser");
-    currentUser = null;
-    budgetData = null;
-
-    showAuth();
-}
-
-// =========================
+// ==========================
 // DOM READY
-// =========================
+// ==========================
 document.addEventListener("DOMContentLoaded", function () {
     const loginBox = document.getElementById("loginBox");
     const registerBox = document.getElementById("registerBox");
 
-    // Switch to Register
+    // Toggle Login/Register
     document.getElementById("showRegister").addEventListener("click", function (e) {
         e.preventDefault();
         loginBox.style.display = "none";
         registerBox.style.display = "block";
     });
 
-    // Switch to Login
     document.getElementById("showLogin").addEventListener("click", function (e) {
         e.preventDefault();
         registerBox.style.display = "none";
         loginBox.style.display = "block";
     });
 
+    // SHOW/HIDE LOGIN PASSWORD
+    document.getElementById("showLoginPassword").addEventListener("change", function () {
+        const loginPasswordField = document.getElementById("loginPassword");
+        loginPasswordField.type = this.checked ? "text" : "password";
+    });
+
+    // SHOW/HIDE REGISTER PASSWORDS
+    document.getElementById("showRegisterPassword").addEventListener("change", function () {
+        const passwordField = document.getElementById("registerPassword");
+        const confirmField = document.getElementById("confirmPassword");
+
+        if (this.checked) {
+            passwordField.type = "text";
+            confirmField.type = "text";
+        } else {
+            passwordField.type = "password";
+            confirmField.type = "password";
+        }
+    });
+
     // REGISTER
     document.getElementById("registerForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const username = document.getElementById("registerUsername").value.trim();
+        const firstName = document.getElementById("registerFirstName").value.trim();
+        const lastName = document.getElementById("registerLastName").value.trim();
+        const number = document.getElementById("registerNumber").value.trim();
+        const email = document.getElementById("registerEmail").value.trim().toLowerCase();
         const password = document.getElementById("registerPassword").value.trim();
         const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
-        if (!username || !password || !confirmPassword) {
+        if (!firstName || !lastName || !number || !email || !password || !confirmPassword) {
             alert("Please fill in all fields.");
+            return;
+        }
+
+        if (password.length < 6) {
+            alert("Password must be at least 6 characters.");
             return;
         }
 
@@ -216,14 +224,21 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         let users = getUsers();
-        let exists = users.find(user => user.username.toLowerCase() === username.toLowerCase());
+        let exists = users.find(user => user.email === email);
 
         if (exists) {
-            alert("Username already exists.");
+            alert("Email already registered.");
             return;
         }
 
-        users.push({ username, password });
+        users.push({
+            firstName,
+            lastName,
+            number,
+            email,
+            password
+        });
+
         saveUsers(users);
 
         alert("Registration successful! You can now login.");
@@ -237,46 +252,42 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("loginForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const username = document.getElementById("loginUsername").value.trim();
+        const email = document.getElementById("loginEmail").value.trim().toLowerCase();
         const password = document.getElementById("loginPassword").value.trim();
 
         let users = getUsers();
-        let foundUser = users.find(user => user.username === username && user.password === password);
+        let foundUser = users.find(user => user.email === email && user.password === password);
 
         if (!foundUser) {
-            alert("Invalid username or password.");
+            alert("Invalid email or password.");
             return;
         }
 
-        currentUser = username;
+        currentUser = email;
         localStorage.setItem("currentUser", currentUser);
 
         loadBudgetData();
         showApp();
+
+        document.getElementById("displayUsername").textContent = `${foundUser.firstName} ${foundUser.lastName}`;
+
         updateUI();
         this.reset();
     });
 
     // LOGOUT
-    document.getElementById("logoutBtn").addEventListener("click", logout);
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        logoutUser();
+    });
 
-    // AUTO LOGIN
-    if (currentUser) {
-        loadBudgetData();
-        showApp();
-        updateUI();
-    } else {
-        showAuth();
-    }
-
-    // ADD BUDGET
+    // Add Budget
     document.getElementById("budgetForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
         let val = parseFloat(document.getElementById("budget").value);
 
         if (isNaN(val) || val <= 0) {
-            alert("Invalid budget amount.");
+            alert("Invalid budget");
             return;
         }
 
@@ -288,7 +299,7 @@ document.addEventListener("DOMContentLoaded", function () {
         this.reset();
     });
 
-    // ADD EXPENSE
+    // Add Expense
     document.getElementById("expenseForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -297,12 +308,12 @@ document.addEventListener("DOMContentLoaded", function () {
         let category = document.getElementById("category").value;
 
         if (!title || isNaN(amount) || amount <= 0) {
-            alert("Invalid expense input.");
+            alert("Invalid expense");
             return;
         }
 
         if (amount > budgetData.budgetLeft) {
-            alert("Not enough budget.");
+            alert("Not enough budget");
             return;
         }
 
@@ -322,8 +333,8 @@ document.addEventListener("DOMContentLoaded", function () {
         this.reset();
     });
 
-    // TABLE ACTIONS
-    document.querySelector(".table-container tbody").addEventListener("click", function (e) {
+    // Table Actions (Edit / Delete / Save / Cancel)
+    document.getElementById("expenseTableBody").addEventListener("click", function (e) {
         let row = e.target.closest("tr");
         if (!row) return;
 
@@ -347,22 +358,10 @@ document.addEventListener("DOMContentLoaded", function () {
         // EDIT
         if (e.target.classList.contains("edit-btn")) {
             let actionCell = row.querySelector(".action-cell");
-            actionCell.innerHTML = "";
 
-            let btnGroup = document.createElement("div");
-            btnGroup.className = "d-flex flex-wrap justify-content-center";
-
-            let saveBtn = document.createElement("button");
-            saveBtn.className = "btn btn-success btn-sm save-btn mr-1";
-            saveBtn.textContent = "Save";
-
-            let cancelBtn = document.createElement("button");
-            cancelBtn.className = "btn btn-secondary btn-sm cancel-btn";
-            cancelBtn.textContent = "Cancel";
-
-            btnGroup.appendChild(saveBtn);
-            btnGroup.appendChild(cancelBtn);
-            actionCell.appendChild(btnGroup);
+            row.dataset.originalTitle = exp.title;
+            row.dataset.originalAmount = exp.amount;
+            row.dataset.originalCategory = exp.category;
 
             let tCell = row.querySelector(".title-cell");
             let aCell = row.querySelector(".amount-cell");
@@ -375,20 +374,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             let aInput = document.createElement("input");
             aInput.type = "number";
-            aInput.min = "0";
-            aInput.step = "0.01";
             aInput.className = "form-control form-control-sm";
+            aInput.min = 0;
+            aInput.step = 0.01;
             aInput.value = exp.amount;
 
             let cSelect = document.createElement("select");
             cSelect.className = "form-control form-control-sm";
-
-            ["Food", "Bills", "Transport", "Entertainment", "School", "Others"].forEach(cat => {
-                let option = document.createElement("option");
-                option.value = cat;
-                option.textContent = cat;
-                if (cat === exp.category) option.selected = true;
-                cSelect.appendChild(option);
+            ["Food", "Bills", "Transport", "Entertainment", "Others"].forEach(cat => {
+                let opt = document.createElement("option");
+                opt.value = cat;
+                opt.textContent = cat;
+                if (cat === exp.category) opt.selected = true;
+                cSelect.appendChild(opt);
             });
 
             tCell.innerHTML = "";
@@ -398,6 +396,11 @@ document.addEventListener("DOMContentLoaded", function () {
             tCell.appendChild(tInput);
             aCell.appendChild(aInput);
             cCell.appendChild(cSelect);
+
+            actionCell.innerHTML = `
+                <button class="btn btn-success btn-sm save-btn mb-1">Save</button>
+                <button class="btn btn-secondary btn-sm cancel-btn mb-1">Cancel</button>
+            `;
         }
 
         // SAVE
@@ -411,14 +414,14 @@ document.addEventListener("DOMContentLoaded", function () {
             let newCategory = cSelect.value;
 
             if (!newTitle || isNaN(newAmount) || newAmount <= 0) {
-                alert("Invalid input.");
+                alert("Invalid input");
                 return;
             }
 
             let diff = newAmount - exp.amount;
 
             if (diff > budgetData.budgetLeft) {
-                alert("Not enough budget.");
+                alert("Not enough budget");
                 return;
             }
 
@@ -435,13 +438,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // CANCEL
         if (e.target.classList.contains("cancel-btn")) {
+            exp.title = row.dataset.originalTitle;
+            exp.amount = parseFloat(row.dataset.originalAmount);
+            exp.category = row.dataset.originalCategory;
+
             updateUI();
         }
     });
 
-    // TOGGLE CHART
+    // Toggle Chart
     document.getElementById("toggleChartBtn").addEventListener("click", function () {
-        const chartDiv = document.getElementById("chartContainer");
+        let chartDiv = document.getElementById("chartContainer");
 
         if (chartDiv.style.display === "none") {
             chartDiv.style.display = "block";
@@ -454,12 +461,31 @@ document.addEventListener("DOMContentLoaded", function () {
         updateUI();
     });
 
-    // REGISTER SERVICE WORKER
+    // AUTO LOGIN
+    if (currentUser) {
+        let users = getUsers();
+        let loggedInUser = users.find(user => user.email === currentUser);
+
+        loadBudgetData();
+        showApp();
+
+        if (loggedInUser) {
+            document.getElementById("displayUsername").textContent = `${loggedInUser.firstName} ${loggedInUser.lastName}`;
+        } else {
+            document.getElementById("displayUsername").textContent = currentUser;
+        }
+
+        updateUI();
+    } else {
+        showAuth();
+    }
+
+    // OPTIONAL: SERVICE WORKER FOR PWA
     if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
             navigator.serviceWorker.register("./service-worker.js")
                 .then(() => console.log("Service Worker Registered"))
-                .catch(err => console.log("Service Worker Failed:", err));
+                .catch(err => console.log("Service Worker Error:", err));
         });
     }
 });

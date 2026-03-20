@@ -99,14 +99,17 @@
     <!-- MAIN APP -->
     <div class="main" id="appSection" style="display: none;">
         <div class="top-bar container-fluid mb-3">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                <h1 class="mb-2 mb-md-0">Budget Tracker System</h1>
-                <div class="user-info text-center text-md-right">
-                    <span id="welcomeText">Welcome, <strong id="displayUsername">User</strong></span>
-                    <button class="btn btn-danger btn-sm ml-md-2 mt-2 mt-md-0" id="logoutBtn">Logout</button>
-                </div>
-            </div>
+    <div class="top-bar-inner">
+        <div class="profile-box">
+            <div class="profile-icon">👤</div>
+            <div class="profile-name" id="displayUsername">User</div>
         </div>
+
+        <button class="btn btn-danger btn-sm logout-btn-custom" id="logoutBtn">Logout</button>
+    </div>
+</div>
+
+<h1 class="main-title">Budget Tracker System</h1>
 
         <div class="budget-container row">
             <!-- Add Budget + Expense -->

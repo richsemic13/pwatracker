@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budget Tracker PWA</title>
-
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#4e73df">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Budget Tracker System</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
 
-    <!-- Custom CSS -->
+    <!-- Style CSS -->
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
     <!-- AUTH SECTION -->
     <div class="auth-wrapper" id="authSection">
-        <div class="auth-container">
+        <div class="auth-card">
             <h2 class="text-center mb-4">Budget Tracker</h2>
 
             <!-- Login -->
@@ -28,17 +23,25 @@
                 <h4 class="text-center mb-3">Login</h4>
                 <form id="loginForm">
                     <div class="form-group">
-                        <label for="loginUsername">Username</label>
-                        <input type="text" class="form-control" id="loginUsername" required>
+                        <label for="loginEmail">Email</label>
+                        <input type="email" class="form-control" id="loginEmail" required>
                     </div>
+
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
                         <input type="password" class="form-control" id="loginPassword" required>
                     </div>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="showLoginPassword">
+                        <label class="form-check-label" for="showLoginPassword">Show Password</label>
+                    </div>
+
                     <button type="submit" class="btn btn-primary btn-block">Login</button>
                 </form>
+
                 <p class="text-center mt-3 mb-0">
-                    No account?
+                    Don't have an account?
                     <a href="#" id="showRegister">Register here</a>
                 </p>
             </div>
@@ -48,19 +51,43 @@
                 <h4 class="text-center mb-3">Register</h4>
                 <form id="registerForm">
                     <div class="form-group">
-                        <label for="registerUsername">Username</label>
-                        <input type="text" class="form-control" id="registerUsername" required>
+                        <label for="registerFirstName">Full Name</label>
+                        <input type="text" class="form-control" id="registerFirstName" required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="registerLastName">Last Name</label>
+                        <input type="text" class="form-control" id="registerLastName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerNumber">Number</label>
+                        <input type="tel" class="form-control" id="registerNumber" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" class="form-control" id="registerEmail" required>
+                    </div>
+
                     <div class="form-group">
                         <label for="registerPassword">Password</label>
                         <input type="password" class="form-control" id="registerPassword" required>
                     </div>
+
                     <div class="form-group">
                         <label for="confirmPassword">Confirm Password</label>
                         <input type="password" class="form-control" id="confirmPassword" required>
                     </div>
+
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="showRegisterPassword">
+                        <label class="form-check-label" for="showRegisterPassword">Show Password</label>
+                    </div>
+
                     <button type="submit" class="btn btn-success btn-block">Register</button>
                 </form>
+
                 <p class="text-center mt-3 mb-0">
                     Already have an account?
                     <a href="#" id="showLogin">Login here</a>
@@ -70,29 +97,28 @@
     </div>
 
     <!-- MAIN APP -->
-    <div class="main d-none" id="appSection">
-        <div class="top-bar">
-            <div class="title-area">
-                <h1>Budget Tracker System</h1>
-                <p class="subtitle">Track your budget, expenses, and savings easily</p>
-            </div>
-            <div class="user-actions">
-                <span class="welcome-text">Welcome, <strong id="displayUsername"></strong></span>
-                <button class="btn btn-danger btn-sm logout-btn" id="logoutBtn">Logout</button>
+    <div class="main" id="appSection" style="display: none;">
+        <div class="top-bar container-fluid mb-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <h1 class="mb-2 mb-md-0">Budget Tracker System</h1>
+                <div class="user-info text-center text-md-right">
+                    <span id="welcomeText">Welcome, <strong id="displayUsername">User</strong></span>
+                    <button class="btn btn-danger btn-sm ml-md-2 mt-2 mt-md-0" id="logoutBtn">Logout</button>
+                </div>
             </div>
         </div>
 
         <div class="budget-container row">
-            <!-- LEFT SIDE -->
-            <div class="add-container col-12 col-lg-4">
+            <!-- Add Budget + Expense -->
+            <div class="add-container col-12 col-md-4">
                 <div class="add-budget-container">
                     <h4>Add Budget</h4>
                     <form id="budgetForm">
                         <div class="form-group">
-                            <label for="budget">Budget Amount:</label>
+                            <label for="budget">Budget:</label>
                             <input class="form-control" type="number" id="budget" min="0" step="0.01" required>
                         </div>
-                        <button class="btn btn-primary form-control" type="submit">Add Budget</button>
+                        <button type="submit" class="btn btn-primary form-control">Add Budget</button>
                     </form>
                 </div>
 
@@ -103,10 +129,12 @@
                             <label for="expense">Expense Title:</label>
                             <input class="form-control" type="text" id="expense" required>
                         </div>
+
                         <div class="form-group">
                             <label for="amount">Amount:</label>
                             <input class="form-control" type="number" id="amount" min="0" step="0.01" required>
                         </div>
+
                         <div class="form-group">
                             <label for="category">Category:</label>
                             <select class="form-control" id="category">
@@ -114,45 +142,36 @@
                                 <option value="Bills">Bills</option>
                                 <option value="Transport">Transport</option>
                                 <option value="Entertainment">Entertainment</option>
-                                <option value="School">School</option>
                                 <option value="Others">Others</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary form-control" type="submit">Add Expense</button>
+
+                        <button type="submit" class="btn btn-primary form-control">Add Expense</button>
                     </form>
                 </div>
 
-                <button class="btn btn-danger form-control mt-3" onclick="resetAll()">Reset All</button>
+                <button class="btn btn-danger form-control mt-2" onclick="resetAll()">Reset All</button>
             </div>
 
-            <!-- RIGHT SIDE -->
-            <div class="display-container col-12 col-lg-8 mt-4 mt-lg-0">
+            <!-- Display Budget + Expenses + Chart -->
+            <div class="display-container col-12 col-md-8">
                 <div class="heading row text-center">
-                    <div class="col-12 col-md-4 mb-2 mb-md-0">
-                        <div class="summary-card">
-                            <p>Total Budget</p>
-                            <h5 id="totalBudget">₱0.00</h5>
-                        </div>
+                    <div class="alert alert-primary col-12 col-md mb-2">
+                        Total Budget: <span id="totalBudget">₱0.00</span>
                     </div>
-                    <div class="col-12 col-md-4 mb-2 mb-md-0">
-                        <div class="summary-card">
-                            <p>Total Expenses</p>
-                            <h5 id="totalExpenses">₱0.00</h5>
-                        </div>
+                    <div class="alert alert-primary col-12 col-md mb-2">
+                        Total Expenses: <span id="totalExpenses">₱0.00</span>
                     </div>
-                    <div class="col-12 col-md-4">
-                        <div class="summary-card">
-                            <p>Budget Left</p>
-                            <h5 id="budgetLeft">₱0.00</h5>
-                        </div>
+                    <div class="alert alert-primary col-12 col-md mb-2">
+                        Budget Left: <span id="budgetLeft">₱0.00</span>
                     </div>
                 </div>
 
                 <hr>
 
                 <div class="table-container table-responsive">
-                    <h5 class="mb-3">Expense History</h5>
-                    <table class="table table-bordered table-sm">
+                    <h5>Expense History:</h5>
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Expense Name</th>
@@ -162,13 +181,13 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr><td colspan="5">No expenses yet.</td></tr>
+                        <tbody id="expenseTableBody">
+                            <tr><td colspan="5" class="text-center">No expenses yet.</td></tr>
                         </tbody>
                     </table>
                 </div>
 
-                <button class="btn btn-info mb-3 w-100" id="toggleChartBtn">Expense Breakdown</button>
+                <button class="btn btn-info mb-3" id="toggleChartBtn">Expense Breakdown</button>
 
                 <div id="chartContainer" style="display: none; max-width: 400px; margin: auto;">
                     <canvas id="expenseChart"></canvas>
@@ -184,7 +203,7 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- JS -->
+    <!-- Script JS -->
     <script src="./script.js"></script>
 </body>
 </html>
